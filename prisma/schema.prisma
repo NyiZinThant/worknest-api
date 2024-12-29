@@ -10,6 +10,7 @@ datasource db {
 model company {
   id             String   @id @db.VarChar(255) @default(uuid())
   name           String   @db.VarChar(100)
+  email          String   @db.VarChar(255) @unique
   overview       String   @db.Text
   employee_count Int
   logo           String   @db.VarChar(255)
@@ -91,7 +92,7 @@ model qualification {
 model user {
   id              String            @id @db.VarChar(255) @default(uuid())
   name            String            @db.VarChar(100)
-  email           String            @db.VarChar(255)
+  email           String            @db.VarChar(255) @unique
   date_of_birth   DateTime          @db.Date
   gender          String            @db.VarChar(50)
   password        String            @db.VarChar(255)
@@ -102,3 +103,4 @@ model user {
   experience      experience[]
   job_application job_application[]
 }
+
