@@ -8,99 +8,114 @@ datasource db {
 }
 
 model company {
-  id             String   @id @db.VarChar(255) @default(uuid())
-  name           String   @db.VarChar(100)
-  email          String   @db.VarChar(255) @unique
-  overview       String?   @db.Text
-  employeeCount Int? @map("employee_count")
-  logo           String?   @db.VarChar(255)
-  password       String   @db.VarChar(255)
-  createdAt     DateTime @default(now()) @db.DateTime(0) @map("created_at")
-  job            job[]
+  id            String   @id @default(uuid()) @db.VarChar(255)
+  name          String   @db.VarChar(100)
+  email         String   @unique @db.VarChar(255)
+  overview      String?  @db.Text
+  employeeCount Int?     @map("employee_count")
+  logo          String?  @db.VarChar(255)
+  password      String   @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  job           job[]
 }
 
 model education {
-  id               String        @id @db.VarChar(255) @default(uuid())
-  fieldOfStudy   String        @db.VarChar(100) @map("field_of_study")
-  qualificationId String        @db.VarChar(255) @map("qualification_id")
-  institution      String        @db.VarChar(255)
-  userId          String        @db.VarChar(255) @map("user_id")
-  startDate       DateTime      @db.Date @map("start_date")
-  endDate         DateTime      @db.Date @map("end_date")
-  createdAt       DateTime      @default(now()) @db.DateTime(0) @map("created_at")
-  qualification    qualification @relation(fields: [qualificationId], references: [id], onDelete: NoAction, map: "fk_education_qualification")
-  user             user          @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_education_user")
+  id              String        @id @default(uuid()) @db.VarChar(255)
+  fieldOfStudy    String        @map("field_of_study") @db.VarChar(100)
+  qualificationId String        @map("qualification_id") @db.VarChar(255)
+  institution     String        @db.VarChar(255)
+  userId          String        @map("user_id") @db.VarChar(255)
+  startDate       DateTime      @map("start_date") @db.Date
+  endDate         DateTime      @map("end_date") @db.Date
+  createdAt       DateTime      @default(now()) @map("created_at") @db.DateTime(0)
+  qualification   qualification @relation(fields: [qualificationId], references: [id], onDelete: NoAction, map: "fk_education_qualification")
+  user            user          @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_education_user")
 
   @@index([qualificationId], map: "fk_education_qualification")
   @@index([userId], map: "fk_education_user")
 }
 
 model experience {
-  id           String    @id @db.VarChar(255) @default(uuid())
-  position     String    @db.VarChar(255)
-  companyName String    @db.VarChar(100) @map("company_name")
-  description  String    @db.Text
-  startDate   DateTime  @db.Date @map("start_date")
-  endDate     DateTime? @db.Date @map("end_date")
-  userId      String    @db.VarChar(255) @map("user_id")
-  created_at   DateTime  @default(now()) @db.DateTime(0)
-  user         user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_experience_user")
+  id          String    @id @default(uuid()) @db.VarChar(255)
+  position    String    @db.VarChar(255)
+  companyName String    @map("company_name") @db.VarChar(100)
+  description String    @db.Text
+  startDate   DateTime  @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date
+  userId      String    @map("user_id") @db.VarChar(255)
+  created_at  DateTime  @default(now()) @db.DateTime(0)
+  user        user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_experience_user")
 
   @@index([userId], map: "fk_experience_user")
 }
 
 model job {
   id              Int               @id @default(autoincrement())
-  companyId      String            @db.VarChar(255) @map("company_id")
+  companyId       String            @map("company_id") @db.VarChar(255)
   position        String            @db.VarChar(255)
-  minSalary      Float             @db.Float @map("min_salary")
-  maxSalary      Float             @db.Float @map("max_salary")
+  minSalary       Float             @map("min_salary") @db.Float
+  maxSalary       Float             @map("max_salary") @db.Float
   information     String            @db.Text
-  startDate      DateTime          @db.Date @map("start_date")
-  endDate        DateTime          @db.Date @map("end_date")
+  startDate       DateTime          @map("start_date") @db.Date
+  endDate         DateTime          @map("end_date") @db.Date
   location        String            @db.VarChar(255)
-  workMode       String            @db.VarChar(100) @map("work_mode")
-  employeeType   String            @db.VarChar(255) @map("employee_type")
-  createdAt      DateTime          @default(now()) @db.DateTime(0) @map("created_at")
+  createdAt       DateTime          @default(now()) @map("created_at") @db.DateTime(0)
   company         company           @relation(fields: [companyId], references: [id], onDelete: Cascade, map: "fk_job_company")
   job_application job_application[]
+  work_mode       work_mode         @relation(fields: [workModeId], references: [id])
+  workModeId      Int               @map("work_mode_id")
+  employee_type   employee_type     @relation(fields: [employeeTypeId], references: [id])
+  employeeTypeId  Int               @map("employee_type_id")
 
   @@index([companyId], map: "fk_job_company")
 }
 
 model job_application {
-  id         String   @id @db.VarChar(255) @default(uuid())
-  jobId     Int @map("job_id")
-  userId    String   @db.VarChar(255) @map("user_id")
-  resume     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.DateTime(0) @map("created_at")
-  job        job      @relation(fields: [jobId], references: [id], onDelete: Cascade, map: "fk_jobapp_job")
-  user       user     @relation(fields: [userId], references: [id], onDelete: NoAction, map: "fk_jobapp_user")
+  id        String   @id @default(uuid()) @db.VarChar(255)
+  jobId     Int      @map("job_id")
+  userId    String   @map("user_id") @db.VarChar(255)
+  resume    String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  job       job      @relation(fields: [jobId], references: [id], onDelete: Cascade, map: "fk_jobapp_job")
+  user      user     @relation(fields: [userId], references: [id], onDelete: NoAction, map: "fk_jobapp_user")
 
   @@index([jobId], map: "fk_jobapp_job")
   @@index([userId], map: "fk_jobapp_user")
 }
 
 model qualification {
-  id                  String      @id @db.VarChar(255) @default(uuid())
-  qualificationLong  String      @db.VarChar(100) @map("qualification_long")
-  qualificationShort String      @db.VarChar(25) @map("qualification_short")
-  created_at          DateTime    @default(now()) @db.DateTime(0)
-  education           education[]
+  id                 String      @id @default(uuid()) @db.VarChar(255)
+  qualificationLong  String      @map("qualification_long") @db.VarChar(100)
+  qualificationShort String      @map("qualification_short") @db.VarChar(25)
+  created_at         DateTime    @default(now()) @db.DateTime(0)
+  education          education[]
 }
 
 model user {
-  id              String            @id @db.VarChar(255) @default(uuid())
+  id              String            @id @default(uuid()) @db.VarChar(255)
   name            String            @db.VarChar(100)
-  email           String            @db.VarChar(255) @unique
-  dateOfBirth   DateTime          @db.Date @map("date_of_birth")
+  email           String            @unique @db.VarChar(255)
+  dateOfBirth     DateTime          @map("date_of_birth") @db.Date
   gender          String            @db.VarChar(50)
   password        String            @db.VarChar(255)
-  bio             String?            @db.Text 
-  profileImage   String?            @db.VarChar(255) @map("profile_image")
-  createdAt      DateTime          @default(now()) @db.DateTime(0) @map("created_at")
+  bio             String?           @db.Text
+  profileImage    String?           @map("profile_image") @db.VarChar(255)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.DateTime(0)
   education       education[]
   experience      experience[]
   job_application job_application[]
 }
 
+model work_mode {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(10)
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  job       job[]
+}
+
+model employee_type {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(10)
+  createdAt DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  job       job[]
+}

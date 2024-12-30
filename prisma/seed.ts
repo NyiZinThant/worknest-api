@@ -35,7 +35,9 @@ const seedCompany = async (count: number): Promise<string[]> => {
 };
 const seedJob = async (
   count: number,
-  companyIds: string[]
+  companyIds: string[],
+  workModeIds: number[],
+  typeIds: number[]
 ): Promise<number[]> => {
   const result: number[] = [];
   console.log('Jobs start seeding.');
@@ -52,16 +54,8 @@ const seedJob = async (
       const startDate = faker.date.past({ years: 1 });
       const endDate = faker.date.future({ years: 1 });
       const location = `${faker.location.city()}, ${faker.location.state()}, ${faker.location.country()}`;
-      const workMode = faker.helpers.arrayElement([
-        'remote',
-        'hybrid',
-        'onsite',
-      ]);
-      const employeeType = faker.helpers.arrayElement([
-        'full-time',
-        'part-time',
-        'contract',
-      ]);
+      const workModeId = faker.helpers.arrayElement(workModeIds);
+      const employeeTypeId = faker.helpers.arrayElement(typeIds);
       const job = await prisma.job.create({
         data: {
           companyId,
@@ -72,8 +66,8 @@ const seedJob = async (
           startDate,
           endDate,
           location,
-          workMode,
-          employeeType,
+          workModeId,
+          employeeTypeId,
         },
       });
       result.push(job.id);
@@ -278,6 +272,48 @@ const seedJobApplication = async (
     process.exit(1);
   }
 };
+const seedEmployeeType = async (): Promise<number[]> => {
+  const result: number[] = [];
+  const data = ['full-time', 'part-time', 'contract'];
+  console.log('Employee type start seeding.');
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const name = data[i];
+      const { id } = await prisma.employee_type.create({
+        data: {
+          name,
+        },
+      });
+      result.push(id);
+    }
+    console.log('Employee type seeded successfully.');
+    return result;
+  } catch (e) {
+    console.error('Error seeding employee types: ', e);
+    process.exit(1);
+  }
+};
+const seedWorkMode = async (): Promise<number[]> => {
+  const result: number[] = [];
+  const data = ['remote', 'hybrid', 'onsite'];
+  console.log('Work modes start seeding.');
+  try {
+    for (let i = 0; i < data.length; i++) {
+      const name = data[i];
+      const { id } = await prisma.work_mode.create({
+        data: {
+          name,
+        },
+      });
+      result.push(id);
+    }
+    console.log('Work modes seeded successfully.');
+    return result;
+  } catch (e) {
+    console.error('Error seeding work modes: ', e);
+    process.exit(1);
+  }
+};
 console.log('Start database seeding!');
 console.time();
 const companyIds = await seedCompany(20);
@@ -285,7 +321,9 @@ const userIds = await seedUser(120);
 const qualificationIds = await seedQualification();
 await seedEducation(240, userIds, qualificationIds);
 await seedExperience(360, userIds);
-const jobIds = await seedJob(60, companyIds);
+const employeeTypeIds = await seedEmployeeType();
+const workModeIds = await seedWorkMode();
+const jobIds = await seedJob(60, companyIds, workModeIds, employeeTypeIds);
 await seedJobApplication(180, userIds, jobIds);
 console.timeEnd();
 console.log('Finish database seeding');
