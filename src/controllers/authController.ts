@@ -36,7 +36,6 @@ const registerUser = async function (
       e = new ApiError(
         'The email is already in use. Please try a different one',
         req.originalUrl,
-        new Date(),
         409
       );
     }
@@ -63,7 +62,6 @@ const loginUser = async function (
       const e = new ApiError(
         'Incorrect email or password',
         req.originalUrl,
-        new Date(),
         401
       );
       next(e);
@@ -84,12 +82,7 @@ const loginUser = async function (
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError(
-        'Incorrect email or password',
-        req.originalUrl,
-        new Date(),
-        401
-      );
+      e = new ApiError('Incorrect email or password', req.originalUrl, 401);
     }
     next(e);
   }
@@ -121,7 +114,6 @@ const registerCompany = async function (
       e = new ApiError(
         'The email is already in use. Please try a different one',
         req.originalUrl,
-        new Date(),
         409
       );
     }
@@ -148,7 +140,6 @@ const loginCompany = async function (
       const e = new ApiError(
         'Incorrect email or password',
         req.originalUrl,
-        new Date(),
         401
       );
       next(e);
@@ -167,12 +158,7 @@ const loginCompany = async function (
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError(
-        'Incorrect email or password',
-        req.originalUrl,
-        new Date(),
-        401
-      );
+      e = new ApiError('Incorrect email or password', req.originalUrl, 401);
     }
     next(e);
   }
