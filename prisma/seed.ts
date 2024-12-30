@@ -51,7 +51,7 @@ const seedJob = async (
       });
       const startDate = faker.date.past({ years: 1 });
       const endDate = faker.date.future({ years: 1 });
-      const location = `${faker.location.streetAddress()}, ${faker.location.city()}, ${faker.location.state()} ${faker.location.zipCode()}, ${faker.location.country()}`;
+      const location = `${faker.location.city()}, ${faker.location.state()}, ${faker.location.country()}`;
       const workMode = faker.helpers.arrayElement([
         'remote',
         'hybrid',
