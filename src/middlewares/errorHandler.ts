@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import ApiError from '../utils/ApiError';
 import ValidationError from 'src/utils/ValidationError';
+import { log } from 'console';
 
 const errorHandler = (
   err: ApiError | ValidationError | Error,
@@ -11,7 +12,7 @@ const errorHandler = (
   if (isExactInstance(err, Error)) {
     err = new ApiError('Internal Server Error', 'unknown', new Date(), 500);
   }
-  res.status((err as ApiError).code).json(err);
+  res.status((err as ApiError).code).json({ ...err, message: err.message });
 };
 
 function isExactInstance(obj: Object, classFunction: Function): boolean {

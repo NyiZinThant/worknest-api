@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { ValidationSubErrorType } from './ValidationError';
+import { ValidationSubErrorType } from '../utils/ValidationError';
 
 const myValidationResult =
   validationResult.withDefaults<ValidationSubErrorType>({

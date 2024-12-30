@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import ValidationError from 'src/utils/ValidationError';
-import myValidationResult from 'src/utils/customValidationResult';
+import myValidationResult from 'src/config/customValidationResult';
 export default function validator(
   req: Request,
   res: Response,

@@ -11,7 +11,7 @@ const seedCompany = async (count: number): Promise<string[]> => {
       const name = faker.company.name();
       const email = faker.internet.email();
       const overview = faker.lorem.paragraphs(3, '\n');
-      const employee_count = faker.number.int({ min: 10, max: 1000 });
+      const employeeCount = faker.number.int({ min: 10, max: 1000 });
       const logo = faker.image.avatarGitHub();
       const hashedPassword = await hash('password', saltRounds);
       const company = await prisma.company.create({
@@ -19,7 +19,7 @@ const seedCompany = async (count: number): Promise<string[]> => {
           name,
           email,
           overview,
-          employee_count,
+          employeeCount,
           logo,
           password: hashedPassword,
         },
@@ -41,39 +41,39 @@ const seedJob = async (
   console.log('Jobs start seeding.');
   try {
     for (let i = 0; i < count; i++) {
-      const company_id = faker.helpers.arrayElement(companyIds);
+      const companyId = faker.helpers.arrayElement(companyIds);
       const position = `${faker.person.jobDescriptor()} ${faker.person.jobArea()} ${faker.person.jobType()}`;
       const information = faker.lorem.paragraphs(6, '\n');
-      const min_salary = faker.number.int({ min: 1000, max: 5000 });
-      const max_salary = faker.number.int({
-        min: min_salary + 100,
+      const minSalary = faker.number.int({ min: 1000, max: 5000 });
+      const maxSalary = faker.number.int({
+        min: minSalary + 100,
         max: 10000,
       });
-      const start_date = faker.date.past({ years: 1 });
-      const end_date = faker.date.future({ years: 1 });
+      const startDate = faker.date.past({ years: 1 });
+      const endDate = faker.date.future({ years: 1 });
       const location = `${faker.location.streetAddress()}, ${faker.location.city()}, ${faker.location.state()} ${faker.location.zipCode()}, ${faker.location.country()}`;
-      const work_mode = faker.helpers.arrayElement([
+      const workMode = faker.helpers.arrayElement([
         'remote',
         'hybrid',
         'onsite',
       ]);
-      const employee_type = faker.helpers.arrayElement([
+      const employeeType = faker.helpers.arrayElement([
         'full-time',
         'part-time',
         'contract',
       ]);
       const job = await prisma.job.create({
         data: {
-          company_id,
+          companyId,
           position,
-          min_salary,
-          max_salary,
+          minSalary,
+          maxSalary,
           information,
-          start_date,
-          end_date,
+          startDate,
+          endDate,
           location,
-          work_mode,
-          employee_type,
+          workMode,
+          employeeType,
         },
       });
       result.push(job.id);
@@ -92,7 +92,7 @@ const seedUser = async (count: number): Promise<string[]> => {
     for (let i = 0; i < count; i++) {
       const name = faker.person.fullName();
       const email = faker.internet.email();
-      const date_of_birth = faker.date.birthdate({
+      const dateOfBirth = faker.date.birthdate({
         mode: 'age',
         min: 18,
         max: 50,
@@ -100,15 +100,15 @@ const seedUser = async (count: number): Promise<string[]> => {
       const gender = faker.helpers.arrayElement(['male', 'female', 'other']);
       const hashedPassword = await hash('password', saltRounds);
       const bio = faker.lorem.paragraphs(2);
-      const profile_image = faker.image.avatar();
+      const profileImage = faker.image.avatar();
       const user = await prisma.user.create({
         data: {
           name,
           email,
-          date_of_birth,
+          dateOfBirth,
           gender,
           bio,
-          profile_image,
+          profileImage,
           password: hashedPassword,
         },
       });
@@ -150,12 +150,12 @@ const seedQualification = async (): Promise<string[]> => {
   console.log('Qualifications start seeding.');
   try {
     for (let qualification of qualifications) {
-      const qualification_long = qualification[0];
-      const qualification_short = qualification[1];
+      const qualificationLong = qualification[0];
+      const qualificationShort = qualification[1];
       const { id } = await prisma.qualification.create({
         data: {
-          qualification_long,
-          qualification_short,
+          qualificationLong,
+          qualificationShort,
         },
       });
       result.push(id);
@@ -200,21 +200,21 @@ const seedEducation = async (
   console.log('Educations start seeding.');
   try {
     for (let i = 0; i < count; i++) {
-      const field_of_study = faker.helpers.arrayElement(fieldsOfStudy);
-      const qualification_id = faker.helpers.arrayElement(qualificationIds);
+      const fieldOfStudy = faker.helpers.arrayElement(fieldsOfStudy);
+      const qualificationId = faker.helpers.arrayElement(qualificationIds);
       const institution = faker.helpers.arrayElement(institutions);
-      const user_id = faker.helpers.arrayElement(userIds);
-      const start_date = faker.date.past({ years: 4 });
-      const end_date = new Date(start_date);
-      end_date.setFullYear(start_date.getFullYear() + 4);
+      const userId = faker.helpers.arrayElement(userIds);
+      const startDate = faker.date.past({ years: 4 });
+      const endDate = new Date(startDate);
+      endDate.setFullYear(startDate.getFullYear() + 4);
       await prisma.education.create({
         data: {
-          field_of_study,
-          qualification_id,
+          fieldOfStudy,
+          qualificationId,
           institution,
-          user_id,
-          start_date,
-          end_date,
+          userId,
+          startDate,
+          endDate,
         },
       });
     }
@@ -230,19 +230,19 @@ const seedExperience = async (count: number, userIds: string[]) => {
   try {
     for (let i = 0; i < count; i++) {
       const position = `${faker.person.jobDescriptor()} ${faker.person.jobArea()} ${faker.person.jobType()}`;
-      const company_name = faker.company.name();
+      const companyName = faker.company.name();
       const description = faker.lorem.paragraphs(2, '\n');
-      const user_id = faker.helpers.arrayElement(userIds);
-      const start_date = faker.date.past({ years: 3 });
-      const end_date = faker.date.past({ years: 1 });
+      const userId = faker.helpers.arrayElement(userIds);
+      const startDate = faker.date.past({ years: 3 });
+      const endDate = faker.date.past({ years: 1 });
       await prisma.experience.create({
         data: {
           position,
-          company_name,
+          companyName,
           description,
-          user_id,
-          start_date,
-          end_date,
+          userId,
+          startDate,
+          endDate,
         },
       });
     }
@@ -262,13 +262,13 @@ const seedJobApplication = async (
   try {
     for (let i = 0; i < count; i++) {
       const resume = 'resume.txt';
-      const user_id = faker.helpers.arrayElement(userIds);
-      const job_id = faker.helpers.arrayElement(jobIds);
+      const userId = faker.helpers.arrayElement(userIds);
+      const jobId = faker.helpers.arrayElement(jobIds);
       await prisma.job_application.create({
         data: {
           resume,
-          job_id,
-          user_id,
+          jobId,
+          userId,
         },
       });
     }

@@ -11,80 +11,80 @@ model company {
   id             String   @id @db.VarChar(255) @default(uuid())
   name           String   @db.VarChar(100)
   email          String   @db.VarChar(255) @unique
-  overview       String   @db.Text
-  employee_count Int
-  logo           String   @db.VarChar(255)
+  overview       String?   @db.Text
+  employeeCount Int? @map("employee_count")
+  logo           String?   @db.VarChar(255)
   password       String   @db.VarChar(255)
-  created_at     DateTime @default(now()) @db.DateTime(0)
+  createdAt     DateTime @default(now()) @db.DateTime(0) @map("created_at")
   job            job[]
 }
 
 model education {
   id               String        @id @db.VarChar(255) @default(uuid())
-  field_of_study   String        @db.VarChar(100)
-  qualification_id String        @db.VarChar(255)
+  fieldOfStudy   String        @db.VarChar(100) @map("field_of_study")
+  qualificationId String        @db.VarChar(255) @map("qualification_id")
   institution      String        @db.VarChar(255)
-  user_id          String        @db.VarChar(255)
-  start_date       DateTime      @db.Date
-  end_date         DateTime      @db.Date
-  created_at       DateTime      @default(now()) @db.DateTime(0)
-  qualification    qualification @relation(fields: [qualification_id], references: [id], onDelete: NoAction, map: "fk_education_qualification")
-  user             user          @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_education_user")
+  userId          String        @db.VarChar(255) @map("user_id")
+  startDate       DateTime      @db.Date @map("start_date")
+  endDate         DateTime      @db.Date @map("end_date")
+  createdAt       DateTime      @default(now()) @db.DateTime(0) @map("created_at")
+  qualification    qualification @relation(fields: [qualificationId], references: [id], onDelete: NoAction, map: "fk_education_qualification")
+  user             user          @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_education_user")
 
-  @@index([qualification_id], map: "fk_education_qualification")
-  @@index([user_id], map: "fk_education_user")
+  @@index([qualificationId], map: "fk_education_qualification")
+  @@index([userId], map: "fk_education_user")
 }
 
 model experience {
   id           String    @id @db.VarChar(255) @default(uuid())
   position     String    @db.VarChar(255)
-  company_name String    @db.VarChar(100)
+  companyName String    @db.VarChar(100) @map("company_name")
   description  String    @db.Text
-  start_date   DateTime  @db.Date
-  end_date     DateTime? @db.Date
-  user_id      String    @db.VarChar(255)
+  startDate   DateTime  @db.Date @map("start_date")
+  endDate     DateTime? @db.Date @map("end_date")
+  userId      String    @db.VarChar(255) @map("user_id")
   created_at   DateTime  @default(now()) @db.DateTime(0)
-  user         user      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "fk_experience_user")
+  user         user      @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_experience_user")
 
-  @@index([user_id], map: "fk_experience_user")
+  @@index([userId], map: "fk_experience_user")
 }
 
 model job {
   id              Int               @id @default(autoincrement())
-  company_id      String            @db.VarChar(255)
+  companyId      String            @db.VarChar(255) @map("company_id")
   position        String            @db.VarChar(255)
-  min_salary      Float             @db.Float
-  max_salary      Float             @db.Float
+  minSalary      Float             @db.Float @map("min_salary")
+  maxSalary      Float             @db.Float @map("max_salary")
   information     String            @db.Text
-  start_date      DateTime          @db.Date
-  end_date        DateTime          @db.Date
+  startDate      DateTime          @db.Date @map("start_date")
+  endDate        DateTime          @db.Date @map("end_date")
   location        String            @db.VarChar(255)
-  work_mode       String            @db.VarChar(100)
-  employee_type   String            @db.VarChar(255)
-  created_at      DateTime          @default(now()) @db.DateTime(0)
-  company         company           @relation(fields: [company_id], references: [id], onDelete: Cascade, map: "fk_job_company")
+  workMode       String            @db.VarChar(100) @map("work_mode")
+  employeeType   String            @db.VarChar(255) @map("employee_type")
+  createdAt      DateTime          @default(now()) @db.DateTime(0) @map("created_at")
+  company         company           @relation(fields: [companyId], references: [id], onDelete: Cascade, map: "fk_job_company")
   job_application job_application[]
 
-  @@index([company_id], map: "fk_job_company")
+  @@index([companyId], map: "fk_job_company")
 }
 
 model job_application {
   id         String   @id @db.VarChar(255) @default(uuid())
-  job_id     Int
-  user_id    String   @db.VarChar(255)
+  jobId     Int @map("job_id")
+  userId    String   @db.VarChar(255) @map("user_id")
   resume     String   @db.VarChar(255)
-  created_at DateTime @default(now()) @db.DateTime(0)
-  job        job      @relation(fields: [job_id], references: [id], onDelete: Cascade, map: "fk_jobapp_job")
-  user       user     @relation(fields: [user_id], references: [id], onDelete: NoAction, map: "fk_jobapp_user")
+  createdAt DateTime @default(now()) @db.DateTime(0) @map("created_at")
+  job        job      @relation(fields: [jobId], references: [id], onDelete: Cascade, map: "fk_jobapp_job")
+  user       user     @relation(fields: [userId], references: [id], onDelete: NoAction, map: "fk_jobapp_user")
 
-  @@index([job_id], map: "fk_jobapp_job")
-  @@index([user_id], map: "fk_jobapp_user")
+  @@index([jobId], map: "fk_jobapp_job")
+  @@index([userId], map: "fk_jobapp_user")
 }
 
 model qualification {
   id                  String      @id @db.VarChar(255) @default(uuid())
-  qualification_long  String      @db.VarChar(100)
-  qualification_short String      @db.VarChar(25)
+  qualificationLong  String      @db.VarChar(100) @map("qualification_long")
+  qualificationShort String      @db.VarChar(25) @map("qualification_short")
   created_at          DateTime    @default(now()) @db.DateTime(0)
   education           education[]
 }
@@ -93,12 +93,12 @@ model user {
   id              String            @id @db.VarChar(255) @default(uuid())
   name            String            @db.VarChar(100)
   email           String            @db.VarChar(255) @unique
-  date_of_birth   DateTime          @db.Date
+  dateOfBirth   DateTime          @db.Date @map("date_of_birth")
   gender          String            @db.VarChar(50)
   password        String            @db.VarChar(255)
-  bio             String            @db.Text
-  profile_image   String            @db.VarChar(255)
-  created_at      DateTime          @default(now()) @db.DateTime(0)
+  bio             String?            @db.Text 
+  profileImage   String?            @db.VarChar(255) @map("profile_image")
+  createdAt      DateTime          @default(now()) @db.DateTime(0) @map("created_at")
   education       education[]
   experience      experience[]
   job_application job_application[]
