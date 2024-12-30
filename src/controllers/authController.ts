@@ -6,6 +6,8 @@ import ApiError from 'src/utils/ApiError';
 import jwtUtil from 'src/utils/jwtUtil';
 const saltRounds = process.env.SALT_ROUND ? +process.env.SALT_ROUND : 10;
 
+// @desc Register new user
+// @route POST /api/v1/auth/user/register
 const registerUser = async function (
   req: Request,
   res: Response,
@@ -42,6 +44,8 @@ const registerUser = async function (
   }
 };
 
+// @desc Login new user
+// @route POST /api/v1/auth/user/login
 const loginUser = async function (
   req: Request,
   res: Response,
@@ -66,6 +70,7 @@ const loginUser = async function (
       return;
     }
     const payload = {
+      id: user?.id,
       fullName: user?.name,
       email: user?.email,
       dob: user?.dateOfBirth,
@@ -90,4 +95,86 @@ const loginUser = async function (
   }
 };
 
-export default { registerUser, loginUser };
+// @desc Register new company
+// @route POST /api/v1/auth/company/register
+const registerCompany = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { name, email, password } = req.body;
+    const hashedPassword = await hash(password, saltRounds);
+    const company = await prisma.company.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
+    res.status(201).json({
+      name: company.name,
+      email: company.email,
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
+      e = new ApiError(
+        'The email is already in use. Please try a different one',
+        req.originalUrl,
+        new Date(),
+        409
+      );
+    }
+    next(e);
+  }
+};
+
+// @desc Login new company
+// @route POST /api/v1/auth/company/login
+const loginCompany = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email, password } = req.body;
+    const comapny = await prisma.company.findFirst({
+      where: {
+        email,
+      },
+    });
+    const result = comapny ? await compare(password, comapny.password) : false;
+    if (!result) {
+      const e = new ApiError(
+        'Incorrect email or password',
+        req.originalUrl,
+        new Date(),
+        401
+      );
+      next(e);
+      return;
+    }
+    const payload = {
+      id: comapny?.id,
+      name: comapny?.name,
+      email: comapny?.email,
+      isUser: false,
+    };
+    const accessToken = jwtUtil.generateToken(payload);
+    res.status(200).json({
+      accessToken,
+      comapny: payload,
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
+      e = new ApiError(
+        'Incorrect email or password',
+        req.originalUrl,
+        new Date(),
+        401
+      );
+    }
+    next(e);
+  }
+};
+export default { registerUser, loginUser, registerCompany, loginCompany };
