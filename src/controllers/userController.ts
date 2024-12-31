@@ -60,12 +60,47 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+type UpdateUserData = {
+  name: string;
+  dateOfBirth: Date;
+  gender: string;
+  bio?: string;
+  profileImage?: string;
+};
 // @desc Update authenticated user
 // @route POST /api/v1/users/me
-const updateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {};
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // fix: after adding middleware
+    const userId = req.params.userId ?? '02d1eef1-49e5-4947-8bbc-c31273face21';
+    const { fullName, dob, gender, bio, profileImage } = req.body;
+    const data: UpdateUserData = {
+      name: fullName,
+      dateOfBirth: new Date(dob),
+      gender: gender,
+    };
+    // todo: add image store process
+    if (profileImage) {
+      data.profileImage = profileImage;
+    }
+    if (bio) {
+      data.bio = bio;
+    }
+    const { password, ...updateUser } = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        ...data,
+      },
+    });
+    if (!updateUser) {
+      throw new ApiError('Unknow user', req.originalUrl, 404);
+    }
+    res.status(200).json(updateUser);
+  } catch (e) {
+    next(new ApiError('Internal Server Error', req.originalUrl, 500));
+  }
+};
 
 export default { getUser, updateUser };

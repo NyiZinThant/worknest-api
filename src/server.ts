@@ -6,6 +6,8 @@ import jobsRouter from './routes/jobs';
 import employeeTypesRouter from './routes/employeeTypes';
 import usersRouter from './routes/users';
 import workModesRouter from './routes/workModes';
+import qualificationsRouter from './routes/qualifications';
+import educationsRouter from './routes/educations';
 const port = process.env.PORT || 3000;
 const app = express();
 
@@ -22,6 +24,8 @@ app.use('/api/v1/jobs', jobsRouter);
 app.use('/api/v1/employee-types', employeeTypesRouter);
 app.use('/api/v1/work-modes', workModesRouter);
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/qualifications', qualificationsRouter);
+app.use('/api/v1/educations', educationsRouter);
 
 // error handler middleware
 app.use(errorHandler);

@@ -48,3 +48,16 @@ export const userLoginRules = [
     .isLength({ min: 8 })
     .withMessage('Must be at least 8 characters'),
 ];
+
+export const userUpdateRules = [
+  body('fullName').trim().escape().notEmpty().withMessage('Required'),
+  body('dob')
+    .trim()
+    .escape()
+    .notEmpty()
+    .withMessage('Required')
+    .bail()
+    .isDate()
+    .withMessage('Wrong format'),
+  body('gender').trim().escape().notEmpty().withMessage('Required'),
+];
