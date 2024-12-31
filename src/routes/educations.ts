@@ -12,6 +12,6 @@ router.post(
   validator,
   educationController.addEducation
 );
-
 router.delete('/:educationId', educationController.removeEducationById);
+
 export default router;

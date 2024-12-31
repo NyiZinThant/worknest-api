@@ -27,6 +27,7 @@ const addEducation = async (
     });
     if (!education) {
       next(new ApiError('Unknown qualification id', req.originalUrl, 400));
+      return;
     }
     res.status(201).json(education);
   } catch (e) {
@@ -37,6 +38,8 @@ const addEducation = async (
   }
 };
 
+// @desc Remove education
+// @route DELETE /api/v1/educations/:educationId
 const removeEducationById = async (
   req: Request,
   res: Response,
@@ -69,6 +72,7 @@ const removeEducationById = async (
           401
         )
       );
+      return;
     }
     const deletedEducation = await prisma.education.delete({
       where: {
