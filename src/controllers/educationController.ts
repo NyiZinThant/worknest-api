@@ -45,25 +45,15 @@ const removeEducationById = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { educationId } = req.params;
   try {
-    const { educationId } = req.params;
     // fix: after adding authetication middleware
     const userId = '8e2a8372-cf68-4b3a-b9e9-0f8d62d19cf0';
-    const education = await prisma.education.findFirst({
+    const education = await prisma.education.findFirstOrThrow({
       where: {
         id: educationId,
       },
     });
-    if (!education) {
-      next(
-        new ApiError(
-          'Education data not found. The specified ID does not exist',
-          req.originalUrl,
-          404
-        )
-      );
-      return;
-    }
     if (education.userId !== userId) {
       next(
         new ApiError(
@@ -81,14 +71,17 @@ const removeEducationById = async (
     });
     res.status(204).json(deletedEducation);
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError(
-        'Education data not found. The specified ID does not exist',
-        req.originalUrl,
-        404
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(
+        new ApiError(
+          `The education with ID ${educationId} does not exist`,
+          req.originalUrl,
+          404
+        )
       );
+    } else {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
-    next(e);
   }
 };
 export default { addEducation, removeEducationById };

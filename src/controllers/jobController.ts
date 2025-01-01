@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
 import prisma from 'src/config/prisma';
 import ApiError from 'src/utils/ApiError';
@@ -93,9 +94,9 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
 // @desc Get job by id
 // @route GET /api/v1/jobs/:jobId
 const getJobById = async (req: Request, res: Response, next: NextFunction) => {
+  const { jobId } = req.params;
   try {
-    const { jobId } = req.params;
-    const job = await prisma.job.findFirst({
+    const job = await prisma.job.findFirstOrThrow({
       where: {
         id: +jobId,
       },
@@ -117,13 +118,6 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
         },
       },
     });
-    if (!job) {
-      throw new ApiError(
-        `The job with ID ${jobId} does not exist`,
-        req.originalUrl,
-        404
-      );
-    }
     res.status(200).json({
       companyName: job.company.name,
       workMode: job.work_mode.name,
@@ -137,10 +131,17 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
       information: job.information,
     });
   } catch (e) {
-    if (!(e instanceof ApiError)) {
-      e = new ApiError('Internal server error', req.originalUrl, 500);
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(
+        new ApiError(
+          `The job with ID ${jobId} does not exist`,
+          req.originalUrl,
+          404
+        )
+      );
+    } else {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
-    next(e);
   }
 };
 

@@ -7,6 +7,6 @@ import { userUpdateRules } from 'src/validators/userValidator';
 const router = express.Router();
 
 router.get('/me', userController.getUser);
-router.get('/:userId', userController.getUser);
+router.get('/:userId', userController.getUserById);
 router.put('/me', userUpdateRules, validator, userController.updateUser);
 export default router;

@@ -46,25 +46,15 @@ const removeExperienceById = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { experienceId } = req.params;
   try {
-    const { experienceId } = req.params;
     // fix: after adding authetication middleware
     const userId = '8e2a8372-cf68-4b3a-b9e9-0f8d62d19cf0';
-    const experience = await prisma.experience.findFirst({
+    const experience = await prisma.experience.findFirstOrThrow({
       where: {
         id: experienceId,
       },
     });
-    if (!experience) {
-      next(
-        new ApiError(
-          'Experience data not found. The specified ID does not exist',
-          req.originalUrl,
-          404
-        )
-      );
-      return;
-    }
     if (experience.userId !== userId) {
       next(
         new ApiError(
@@ -82,14 +72,17 @@ const removeExperienceById = async (
     });
     res.status(204).json(deletedExperience);
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError(
-        'Experience data not found. The specified ID does not exist',
-        req.originalUrl,
-        404
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(
+        new ApiError(
+          `The experience with ID ${experienceId} does not exist`,
+          req.originalUrl,
+          404
+        )
       );
+    } else {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
-    next(e);
   }
 };
 export default { addExperience, removeExperienceById };

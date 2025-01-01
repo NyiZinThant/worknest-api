@@ -52,7 +52,7 @@ const loginUser = async function (
 ) {
   try {
     const { email, password } = req.body;
-    const user = await prisma.user.findFirst({
+    const user = await prisma.user.findFirstOrThrow({
       where: {
         email,
       },
@@ -81,10 +81,11 @@ const loginUser = async function (
       user: payload,
     });
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError('Incorrect email or password', req.originalUrl, 401);
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(new ApiError('Incorrect email or password', req.originalUrl, 401));
+    } else {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
-    next(e);
   }
 };
 
@@ -130,7 +131,7 @@ const loginCompany = async function (
 ) {
   try {
     const { email, password } = req.body;
-    const comapny = await prisma.company.findFirst({
+    const comapny = await prisma.company.findFirstOrThrow({
       where: {
         email,
       },
@@ -157,10 +158,11 @@ const loginCompany = async function (
       comapny: payload,
     });
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2001') {
-      e = new ApiError('Incorrect email or password', req.originalUrl, 401);
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(new ApiError('Incorrect email or password', req.originalUrl, 401));
+    } else {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
-    next(e);
   }
 };
 export default { registerUser, loginUser, registerCompany, loginCompany };

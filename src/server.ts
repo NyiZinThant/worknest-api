@@ -9,6 +9,7 @@ import workModesRouter from './routes/workModes';
 import qualificationsRouter from './routes/qualifications';
 import educationsRouter from './routes/educations';
 import experiencesRouter from './routes/experiences';
+import companiesRouter from './routes/companies';
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/qualifications', qualificationsRouter);
 app.use('/api/v1/educations', educationsRouter);
 app.use('/api/v1/experiences', experiencesRouter);
+app.use('/api/v1/companies', companiesRouter);
 
 // error handler middleware
 app.use(errorHandler);
