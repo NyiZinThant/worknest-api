@@ -122,15 +122,14 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // fix: after adding middleware
     const userId = req.params.userId ?? '02d1eef1-49e5-4947-8bbc-c31273face21';
-    const { fullName, dob, gender, bio, profileImage } = req.body;
+    const { fullName, dob, gender, bio } = req.body;
     const data: UpdateUserData = {
       name: fullName,
       dateOfBirth: new Date(dob),
       gender: gender,
     };
-    // todo: add image store process
-    if (profileImage) {
-      data.profileImage = profileImage;
+    if (req.file) {
+      data.profileImage = req.file.path;
     }
     if (bio) {
       data.bio = bio;

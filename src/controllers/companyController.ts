@@ -71,5 +71,44 @@ const getCompanyById = async (
     }
   }
 };
+type UpdateCompanyData = {
+  name: string;
+  overview: string;
+  employeeCount: number;
+  logo?: string;
+};
+const updateCompany = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // fix: after adding middleware
+    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+    const { name, overview, employeeCount } = req.body;
+    const data: UpdateCompanyData = {
+      name,
+      overview,
+      employeeCount: +employeeCount,
+    };
+    if (req.file) {
+      data.logo = req.file.filename;
+    }
+    const { password, ...updatedCompany } = await prisma.company.update({
+      where: {
+        id: companyId,
+      },
+      data: {
+        ...data,
+      },
+    });
+    if (!updatedCompany) {
+      throw new ApiError('Unknow company', req.originalUrl, 404);
+    }
+    res.status(200).json(updatedCompany);
+  } catch (e) {
+    next(new ApiError('Internal Server Error', req.originalUrl, 500));
+  }
+};
 
-export default { getCompany, getCompanyById };
+export default { getCompany, getCompanyById, updateCompany };

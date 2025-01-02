@@ -38,3 +38,16 @@ export const companyLoginRules = [
     .isLength({ min: 8 })
     .withMessage('Must be at least 8 characters'),
 ];
+
+export const updateCompanyRules = [
+  body('name').trim().escape().notEmpty().withMessage('Required'),
+  body('overview').trim().escape().notEmpty().withMessage('Required'),
+  body('employeeCount')
+    .trim()
+    .escape()
+    .notEmpty()
+    .withMessage('Required')
+    .bail()
+    .isNumeric()
+    .withMessage('Wrong data type'),
+];

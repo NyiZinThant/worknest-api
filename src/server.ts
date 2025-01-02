@@ -10,16 +10,19 @@ import qualificationsRouter from './routes/qualifications';
 import educationsRouter from './routes/educations';
 import experiencesRouter from './routes/experiences';
 import companiesRouter from './routes/companies';
+import path from 'path';
 
 const port = process.env.PORT || 3000;
 const app = express();
-
 // body-parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // cors middleware
 app.use(cors());
+
+// static route for images
+app.use('/images', express.static('uploads/images'));
 
 // routes
 app.use('/api/v1/auth', authRouter);
