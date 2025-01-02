@@ -19,6 +19,13 @@ const getCompany = async (req: Request, res: Response, next: NextFunction) => {
           orderBy: {
             createdAt: order === 'asc' ? 'asc' : 'desc',
           },
+          include: {
+            job_application: {
+              orderBy: {
+                createdAt: 'asc',
+              },
+            },
+          },
         },
       },
     });

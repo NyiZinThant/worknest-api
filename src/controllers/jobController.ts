@@ -95,6 +95,8 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
 // @route GET /api/v1/jobs/:jobId
 const getJobById = async (req: Request, res: Response, next: NextFunction) => {
   const { jobId } = req.params;
+  // fix: after adding authentication middleware
+  const userId = 'e7aa3400-f9ff-4e44-b957-19365171ebd9';
   try {
     const job = await prisma.job.findFirstOrThrow({
       where: {
@@ -116,6 +118,11 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
             name: true,
           },
         },
+        job_application: {
+          where: {
+            userId: userId,
+          },
+        },
       },
     });
     res.status(200).json({
@@ -129,6 +136,7 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
       endDate: job.endDate,
       location: job.location,
       information: job.information,
+      userJobApplication: job.job_application[0],
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {

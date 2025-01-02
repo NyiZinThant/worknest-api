@@ -31,6 +31,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
           createdAt: order === 'asc' ? 'asc' : 'desc',
         },
         select: {
+          id: true,
           resume: true,
           createdAt: true,
           job: {
@@ -52,6 +53,7 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
       ? // @ts-ignore
         user.job_application.map((app) => {
           const newApp = {
+            id: app.id,
             appliedAt: app.createdAt,
             resume: app.resume,
             position: app.job.position,
@@ -115,7 +117,7 @@ type UpdateUserData = {
   profileImage?: string;
 };
 // @desc Update authenticated user
-// @route POST /api/v1/users/me
+// @route PUT /api/v1/users/me
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // fix: after adding middleware
