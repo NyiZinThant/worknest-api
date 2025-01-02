@@ -15,6 +15,10 @@ router.post(
   resumeUpload.single('resume'),
   jobApplicationController.addJobApp
 );
+router.get(
+  '/:jobId/job-applications/:jobAppId',
+  jobApplicationController.downloadResume
+);
 router.post('/', postJobRules, validator, jobController.createJob);
 
 export default router;

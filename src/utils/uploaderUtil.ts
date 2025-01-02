@@ -45,19 +45,6 @@ export const imageUpload = multer({
   fileFilter: imageFileFilter,
   limits: { fileSize: 10 * 500 * 1024 }, // 5 mb
 });
-export const isImageFile = (file: Express.Multer.File): boolean => {
-  // Allowed file types
-  const allowedMimeTypes = [
-    'image/jpeg', // JPEG
-    'image/png', // PNG
-    'image/gif', // GIF
-    'image/webp', // WebP
-  ];
-  if (allowedMimeTypes.includes(file.mimetype)) {
-    return true;
-  }
-  return false;
-};
 const resumeFileFilter = (
   req: Request,
   file: Express.Multer.File,

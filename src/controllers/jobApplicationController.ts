@@ -33,7 +33,7 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
       data: {
         jobId: job.id,
         userId: userId,
-        resume: req.file.path,
+        resume: req.file.filename,
       },
     });
     res.status(201).json(newJobApp);
@@ -54,4 +54,61 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default { addJobApp };
+const downloadResume = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { jobAppId } = req.params;
+  try {
+    const userId = 'e7aa3400-f9ff-4e44-b957-19365171ebd9';
+    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+    const jobApp = await prisma.job_application.findFirstOrThrow({
+      select: {
+        userId: true,
+        resume: true,
+        job: {
+          select: {
+            companyId: true,
+          },
+        },
+      },
+      where: {
+        id: jobAppId,
+      },
+    });
+    if (
+      (userId && userId === jobApp.userId) ||
+      (companyId && companyId === jobApp.job.companyId)
+    ) {
+      const resumeFullPath = `${import.meta.dirname}/../../uploads/resumes/${
+        jobApp.resume
+      }`;
+      res.status(200).download(resumeFullPath);
+      return;
+    }
+    next(
+      new ApiError(
+        'You do not have permission to download this resume.',
+        req.originalUrl,
+        401
+      )
+    );
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
+      next(
+        new ApiError(
+          `The job application with ID ${jobAppId} does not exist`,
+          req.originalUrl,
+          404
+        )
+      );
+    }
+    if (!(e instanceof ApiError)) {
+      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+    }
+    next(e);
+  }
+};
+
+export default { addJobApp, downloadResume };
