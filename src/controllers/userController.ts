@@ -8,8 +8,17 @@ import ApiError from 'src/utils/ApiError';
 // @route GET /api/v1/users/me
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // fix: after adding middleware
-    const userId = '0bec5c7e-d50f-4a49-a1ea-ba5736894e82';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const userId = req.profile.id;
     const { order, include } = req.query;
     const userArgs: Prisma.userFindUniqueOrThrowArgs = {
       where: {
@@ -79,7 +88,6 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
 const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
   try {
-    // fix: after adding middleware
     const { password, ...user } = await prisma.user.findFirstOrThrow({
       where: {
         id: userId,
@@ -120,8 +128,17 @@ type UpdateUserData = {
 // @route PUT /api/v1/users/me
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // fix: after adding middleware
-    const userId = req.params.userId ?? '02d1eef1-49e5-4947-8bbc-c31273face21';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const userId = req.profile.id;
     const { fullName, dob, gender, bio } = req.body;
     const data: UpdateUserData = {
       name: fullName,

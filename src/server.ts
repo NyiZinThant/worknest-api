@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import errorHandler from './middlewares/errorHandler';
 import authRouter from './routes/auth';
@@ -10,13 +10,15 @@ import qualificationsRouter from './routes/qualifications';
 import educationsRouter from './routes/educations';
 import experiencesRouter from './routes/experiences';
 import companiesRouter from './routes/companies';
-import path from 'path';
+import cookieParser from 'cookie-parser';
+import authenticate from './middlewares/authenticate';
 
 const port = process.env.PORT || 3000;
 const app = express();
-// body-parser middleware
+// parser middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // cors middleware
 app.use(cors());
@@ -34,7 +36,14 @@ app.use('/api/v1/qualifications', qualificationsRouter);
 app.use('/api/v1/educations', educationsRouter);
 app.use('/api/v1/experiences', experiencesRouter);
 app.use('/api/v1/companies', companiesRouter);
-
+app.get(
+  '/test',
+  authenticate(['user', 'company']),
+  (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.profile);
+    res.sendStatus(200);
+  }
+);
 // error handler middleware
 app.use(errorHandler);
 

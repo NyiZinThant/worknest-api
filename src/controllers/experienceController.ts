@@ -11,8 +11,17 @@ const addExperience = async (
   next: NextFunction
 ) => {
   try {
-    // fix: after adding authentication
-    const userId = '8e2a8372-cf68-4b3a-b9e9-0f8d62d19cf0';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const userId = req.profile.id;
     const {
       position,
       companyName,
@@ -48,8 +57,17 @@ const removeExperienceById = async (
 ) => {
   const { experienceId } = req.params;
   try {
-    // fix: after adding authetication middleware
-    const userId = '8e2a8372-cf68-4b3a-b9e9-0f8d62d19cf0';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const userId = req.profile.id;
     const experience = await prisma.experience.findFirstOrThrow({
       where: {
         id: experienceId,

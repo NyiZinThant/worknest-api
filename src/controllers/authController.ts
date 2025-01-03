@@ -67,35 +67,32 @@ const loginUser = async function (
       next(e);
       return;
     }
-    const payload = {
-      id: user?.id,
-      fullName: user?.name,
-      email: user?.email,
-      dob: user?.dateOfBirth,
-      gender: user?.gender,
-      type: 'user',
-    };
     const { access, refresh } = jwtUtil.generateTokens({
-      id: payload.id,
-      type: payload.type,
+      id: user.id,
+      type: 'user',
     });
     res.cookie('accessToken', access.token, {
       secure: true,
       httpOnly: true,
-      expires: access.exp,
+      maxAge: access.exp,
     });
     res.cookie('refreshToken', refresh.token, {
       secure: true,
       httpOnly: true,
-      expires: refresh.exp,
+      maxAge: refresh.exp,
     });
-    res.status(200).json(payload);
+    res.status(200).json({
+      id: user.id,
+      fullName: user.name,
+      email: user.email,
+      dob: user.dateOfBirth,
+      gender: user.gender,
+      type: 'user',
+    });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(new ApiError('Incorrect email or password', req.originalUrl, 401));
     } else {
-      console.log(e);
-
       next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
   }
@@ -143,12 +140,12 @@ const loginCompany = async function (
 ) {
   try {
     const { email, password } = req.body;
-    const comapny = await prisma.company.findFirstOrThrow({
+    const company = await prisma.company.findFirstOrThrow({
       where: {
         email,
       },
     });
-    const result = comapny ? await compare(password, comapny.password) : false;
+    const result = company ? await compare(password, company.password) : false;
     if (!result) {
       const e = new ApiError(
         'Incorrect email or password',
@@ -158,28 +155,25 @@ const loginCompany = async function (
       next(e);
       return;
     }
-    const payload = {
-      id: comapny?.id,
-      name: comapny?.name,
-      email: comapny?.email,
-      type: 'company',
-    };
     const { access, refresh } = jwtUtil.generateTokens({
-      id: payload.id,
-      type: payload.type,
+      id: company.id,
+      type: 'company',
     });
     res.cookie('accessToken', access.token, {
       secure: true,
       httpOnly: true,
-      expires: access.exp,
+      maxAge: access.exp,
     });
     res.cookie('refreshToken', refresh.token, {
       secure: true,
       httpOnly: true,
-      expires: refresh.exp,
+      maxAge: refresh.exp,
     });
     res.status(200).json({
-      comapny: payload,
+      id: company.id,
+      name: company.name,
+      email: company.email,
+      type: 'company',
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {

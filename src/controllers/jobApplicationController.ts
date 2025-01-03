@@ -12,8 +12,17 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     const { jobId } = req.params;
-    // fix: after adding authentication middleware
-    const userId = 'e7aa3400-f9ff-4e44-b957-19365171ebd9';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const userId = req.profile.id;
     const job = await prisma.job.findFirstOrThrow({
       where: {
         id: +jobId,
@@ -61,8 +70,18 @@ const downloadResume = async (
 ) => {
   const { jobAppId } = req.params;
   try {
-    const userId = 'e7aa3400-f9ff-4e44-b957-19365171ebd9';
-    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const companyId = req.profile.type === 'company' && req.profile.id;
+    const userId = req.profile.type === 'user' && req.profile.id;
     const jobApp = await prisma.job_application.findFirstOrThrow({
       select: {
         userId: true,

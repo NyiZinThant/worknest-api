@@ -95,8 +95,20 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
 // @route GET /api/v1/jobs/:jobId
 const getJobById = async (req: Request, res: Response, next: NextFunction) => {
   const { jobId } = req.params;
-  // fix: after adding authentication middleware
-  const userId = 'e7aa3400-f9ff-4e44-b957-19365171ebd9';
+  if (!req.profile) {
+    next(
+      new ApiError(
+        'You do not have permission to access this resource',
+        req.originalUrl,
+        401
+      )
+    );
+    return;
+  }
+  const whereOption: { userId?: string } = {};
+  if (req.profile.type === 'user') {
+    whereOption.userId = req.profile.id;
+  }
   try {
     const job = await prisma.job.findFirstOrThrow({
       where: {
@@ -119,9 +131,7 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
           },
         },
         job_application: {
-          where: {
-            userId: userId,
-          },
+          where: whereOption,
         },
       },
     });
@@ -157,6 +167,17 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
 // @route POST /api/v1/jobs/
 const createJob = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const companyId = req.profile.id;
     const {
       position,
       minSalary,
@@ -168,8 +189,7 @@ const createJob = async (req: Request, res: Response, next: NextFunction) => {
       employeeType,
       workMode,
     } = req.body;
-    // fix: after adding middleware
-    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+
     const job = await prisma.job.create({
       data: {
         position,

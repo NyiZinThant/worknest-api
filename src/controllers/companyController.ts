@@ -7,9 +7,18 @@ import ApiError from 'src/utils/ApiError';
 // @route GET /api/v1/companies/me
 const getCompany = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // fix: after adding middleware
     const { order } = req.query;
-    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const companyId = req.profile.id;
     const { password, ...company } = await prisma.company.findUniqueOrThrow({
       where: {
         id: companyId,
@@ -47,7 +56,6 @@ const getCompanyById = async (
   next: NextFunction
 ) => {
   try {
-    // fix: after adding middleware
     const { order } = req.query;
     const { companyId } = req.params;
     const { password, ...company } = await prisma.company.findUniqueOrThrow({
@@ -83,8 +91,17 @@ const updateCompany = async (
   next: NextFunction
 ) => {
   try {
-    // fix: after adding middleware
-    const companyId = '00315480-4f6a-4ca8-b418-7df9934e16a3';
+    if (!req.profile) {
+      next(
+        new ApiError(
+          'You do not have permission to access this resource',
+          req.originalUrl,
+          401
+        )
+      );
+      return;
+    }
+    const companyId = req.profile.id;
     const { name, overview, employeeCount } = req.body;
     const data: UpdateCompanyData = {
       name,
