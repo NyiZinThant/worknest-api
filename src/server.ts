@@ -36,14 +36,7 @@ app.use('/api/v1/qualifications', qualificationsRouter);
 app.use('/api/v1/educations', educationsRouter);
 app.use('/api/v1/experiences', experiencesRouter);
 app.use('/api/v1/companies', companiesRouter);
-app.get(
-  '/test',
-  authenticate(['user', 'company']),
-  (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.profile);
-    res.sendStatus(200);
-  }
-);
+
 // error handler middleware
 app.use(errorHandler);
 

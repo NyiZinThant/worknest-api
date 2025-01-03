@@ -8,14 +8,7 @@ const authenticate =
     try {
       const accessToken = req.cookies.accessToken;
       if (!accessToken) {
-        next(
-          new ApiError(
-            'Authentication failed. Please provide a valid access token',
-            req.originalUrl,
-            401
-          )
-        );
-        return;
+        throw new Error('MissingToken');
       }
       const payload: any = jwtUtil.verify(accessToken, 'access');
       if (!allowTypes.includes(payload.type)) {
@@ -31,7 +24,10 @@ const authenticate =
       req.profile = payload;
       next();
     } catch (e) {
-      if (e instanceof Error && e.name === 'TokenExpiredError') {
+      if (
+        e instanceof Error &&
+        (e.name === 'TokenExpiredError' || e.message === 'MissingToken')
+      ) {
         try {
           const refreshToken = req.cookies.refreshToken;
           if (!refreshToken) {
