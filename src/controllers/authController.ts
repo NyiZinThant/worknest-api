@@ -73,17 +73,29 @@ const loginUser = async function (
       email: user?.email,
       dob: user?.dateOfBirth,
       gender: user?.gender,
-      isUser: true,
+      type: 'user',
     };
-    const accessToken = jwtUtil.generateToken(payload);
-    res.status(200).json({
-      accessToken,
-      user: payload,
+    const { access, refresh } = jwtUtil.generateTokens({
+      id: payload.id,
+      type: payload.type,
     });
+    res.cookie('accessToken', access.token, {
+      secure: true,
+      httpOnly: true,
+      expires: access.exp,
+    });
+    res.cookie('refreshToken', refresh.token, {
+      secure: true,
+      httpOnly: true,
+      expires: refresh.exp,
+    });
+    res.status(200).json(payload);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(new ApiError('Incorrect email or password', req.originalUrl, 401));
     } else {
+      console.log(e);
+
       next(new ApiError('Internal Server Error', req.originalUrl, 500));
     }
   }
@@ -150,11 +162,23 @@ const loginCompany = async function (
       id: comapny?.id,
       name: comapny?.name,
       email: comapny?.email,
-      isUser: false,
+      type: 'company',
     };
-    const accessToken = jwtUtil.generateToken(payload);
+    const { access, refresh } = jwtUtil.generateTokens({
+      id: payload.id,
+      type: payload.type,
+    });
+    res.cookie('accessToken', access.token, {
+      secure: true,
+      httpOnly: true,
+      expires: access.exp,
+    });
+    res.cookie('refreshToken', refresh.token, {
+      secure: true,
+      httpOnly: true,
+      expires: refresh.exp,
+    });
     res.status(200).json({
-      accessToken,
       comapny: payload,
     });
   } catch (e) {
