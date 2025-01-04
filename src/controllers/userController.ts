@@ -3,7 +3,51 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
 import prisma from 'src/config/prisma';
 import ApiError from 'src/utils/ApiError';
+const DEFAULT_PAGE = +(process.env.DEFAULT_PAGE || 1);
+const DEFAULT_LIMIT = +(process.env.DEFAULT_LIMIT || 10);
 
+// @desc Get all users
+// @route GET /api/v1/users
+const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const {
+      search = '',
+      limit = DEFAULT_LIMIT,
+      page = DEFAULT_PAGE,
+      order = 'desc',
+    } = req.query;
+    const [users, totalUser] = await Promise.all([
+      prisma.user.findMany({
+        skip: +limit * (+page - 1),
+        take: +limit,
+        where: {
+          name: { contains: search + '' },
+        },
+        orderBy: {
+          createdAt: order === 'desc' ? 'desc' : 'asc',
+        },
+      }),
+      prisma.user.count({ where: { name: { contains: search + '' } } }),
+    ]);
+    res.status(200).json({
+      users,
+      metadata: {
+        totalUser,
+        totalPages: Math.ceil(totalUser / +limit),
+        currentPage: page,
+      },
+    });
+  } catch (e) {
+    next(
+      new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
+  }
+};
 // @desc Get authenticated user details
 // @route GET /api/v1/users/me
 const getUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -202,4 +246,4 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default { getUser, getUserById, updateUser };
+export default { getUsers, getUser, getUserById, updateUser };

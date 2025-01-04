@@ -50,6 +50,8 @@ const authenticate =
             httpOnly: true,
             maxAge: newAccess.exp,
           });
+          next();
+          return;
         } catch (e) {
           if (e instanceof Error && e.name === 'TokenExpiredError') {
             next(

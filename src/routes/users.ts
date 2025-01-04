@@ -8,6 +8,7 @@ import { userUpdateRules } from 'src/validators/userValidator';
 // base route /api/v1/users/me
 const router = express.Router();
 
+router.get('/', authenticate(['user', 'company']), userController.getUsers);
 router.get('/me', authenticate(['user']), userController.getUser);
 router.get(
   '/:userId',

@@ -1,26 +1,17 @@
+import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NextFunction, Request, Response } from 'express';
 import prisma from 'src/config/prisma';
 import ApiError from 'src/utils/ApiError';
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 10;
-type Where = {
-  minSalary?: {
-    gte: number;
-  };
-  maxSalary?: {
-    lte: number;
-  };
-  workModeId?: number;
-  employeeTypeId?: number;
-  endDate?: { gte: Date };
-};
+const DEFAULT_PAGE = +(process.env.DEFAULT_PAGE || 1);
+const DEFAULT_LIMIT = +(process.env.DEFAULT_LIMIT || 10);
 
 // @desc Get all jobs
 // @route GET /api/v1/jobs/
 const getJobs = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {
+      search = '',
       limit = DEFAULT_LIMIT,
       page = DEFAULT_PAGE,
       mode,
@@ -28,7 +19,8 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
       min,
       max,
     } = req.query;
-    const where: Where = {
+    const where: Prisma.jobWhereInput = {
+      position: { contains: search + '' },
       endDate: { gte: new Date() },
     };
     if (min) {
