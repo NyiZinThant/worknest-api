@@ -13,7 +13,14 @@ const getQualifications = async (
     const qualifications = await prisma.qualification.findMany();
     res.status(200).json(qualifications);
   } catch (e) {
-    next(new ApiError('Inetrnal Server Error', req.originalUrl, 500));
+    next(
+      new ApiError(
+        'Inetrnal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
   }
 };
 

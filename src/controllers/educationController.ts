@@ -14,7 +14,8 @@ const addEducation = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -35,13 +36,25 @@ const addEducation = async (
       },
     });
     if (!education) {
-      next(new ApiError('Unknown qualification id', req.originalUrl, 400));
+      next(
+        new ApiError(
+          `The qualification does not exist.`,
+          'UnknownQualification',
+          req.originalUrl,
+          400
+        )
+      );
       return;
     }
     res.status(201).json(education);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2003') {
-      e = new ApiError('Unknown qualification id', req.originalUrl, 404);
+      e = new ApiError(
+        `The qualification does not exist.`,
+        'UnknownQualification',
+        req.originalUrl,
+        404
+      );
     }
     next(e);
   }
@@ -59,7 +72,8 @@ const removeEducationById = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -75,7 +89,8 @@ const removeEducationById = async (
     if (education.userId !== userId) {
       next(
         new ApiError(
-          'Unauthorized access. You do not have permission to delete this education data',
+          'You do not have permission to delete this education data.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -92,13 +107,21 @@ const removeEducationById = async (
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          `The education with ID ${educationId} does not exist`,
+          `The education with ID ${educationId} does not exist.`,
+          'UnknownEducation',
           req.originalUrl,
           404
         )
       );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };

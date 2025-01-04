@@ -8,7 +8,7 @@ export default class ValidationError extends ApiError {
     errors: ValidationSubErrorType[],
     statusCode?: number
   ) {
-    super('ValidationError', path, statusCode);
+    super('Invalid request body', 'InvalidRequest', path, statusCode);
     this.errors = errors;
   }
 }

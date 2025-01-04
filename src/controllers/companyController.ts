@@ -11,7 +11,8 @@ const getCompany = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -41,9 +42,23 @@ const getCompany = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json(company);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
-      next(new ApiError('Unknow Company', req.originalUrl, 401));
+      next(
+        new ApiError(
+          'Can not find the company.',
+          'UnknownCompany',
+          req.originalUrl,
+          401
+        )
+      );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -73,9 +88,23 @@ const getCompanyById = async (
     res.status(200).json(company);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
-      next(new ApiError('Unknow Company', req.originalUrl, 401));
+      next(
+        new ApiError(
+          'Can not find the company.',
+          'UnknownCompany',
+          req.originalUrl,
+          401
+        )
+      );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -94,7 +123,8 @@ const updateCompany = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -120,11 +150,23 @@ const updateCompany = async (
       },
     });
     if (!updatedCompany) {
-      throw new ApiError('Unknow company', req.originalUrl, 404);
+      throw new ApiError(
+        'Can not find the company.',
+        'UnknownCompany',
+        req.originalUrl,
+        404
+      );
     }
     res.status(200).json(updatedCompany);
   } catch (e) {
-    next(new ApiError('Internal Server Error', req.originalUrl, 500));
+    next(
+      new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
   }
 };
 

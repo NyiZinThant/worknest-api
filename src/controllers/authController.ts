@@ -34,7 +34,8 @@ const registerUser = async function (
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
       e = new ApiError(
-        'The email is already in use. Please try a different one',
+        'The email is already in use. Please try a different one.',
+        'EmailAlreadyInUse',
         req.originalUrl,
         409
       );
@@ -60,7 +61,8 @@ const loginUser = async function (
     const result = user ? await compare(password, user.password) : false;
     if (!result) {
       const e = new ApiError(
-        'Incorrect email or password',
+        'Incorrect email or password.',
+        'InvalidCredentials',
         req.originalUrl,
         401
       );
@@ -91,9 +93,23 @@ const loginUser = async function (
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
-      next(new ApiError('Incorrect email or password', req.originalUrl, 401));
+      next(
+        new ApiError(
+          'Incorrect email or password.',
+          'InvalidCredentials',
+          req.originalUrl,
+          401
+        )
+      );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'Server Error',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -122,7 +138,8 @@ const registerCompany = async function (
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2002') {
       e = new ApiError(
-        'The email is already in use. Please try a different one',
+        'The email is already in use. Please try a different one.',
+        'EmailAlreadyInUse',
         req.originalUrl,
         409
       );
@@ -148,7 +165,8 @@ const loginCompany = async function (
     const result = company ? await compare(password, company.password) : false;
     if (!result) {
       const e = new ApiError(
-        'Incorrect email or password',
+        'Incorrect email or password.',
+        'InvalidCredentials',
         req.originalUrl,
         401
       );
@@ -177,9 +195,23 @@ const loginCompany = async function (
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
-      next(new ApiError('Incorrect email or password', req.originalUrl, 401));
+      next(
+        new ApiError(
+          'Incorrect email or password.',
+          'InvalidCredentials',
+          req.originalUrl,
+          401
+        )
+      );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };

@@ -3,8 +3,15 @@ export default class ApiError extends Error {
   code: number;
   path: string;
   timestamp: Date;
-  constructor(message: string, path: string, statusCode?: number) {
+  error: string;
+  constructor(
+    message: string,
+    error: string,
+    path: string,
+    statusCode?: number
+  ) {
     super(message);
+    this.error = error;
     this.status = 'error';
     this.code = statusCode || 500;
     this.path = path;

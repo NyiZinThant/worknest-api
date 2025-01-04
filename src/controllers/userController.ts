@@ -11,7 +11,8 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -75,10 +76,22 @@ const getUser = async (req: Request, res: Response, next: NextFunction) => {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
-        new ApiError('Cannot find authenticated user', req.originalUrl, 404)
+        new ApiError(
+          'Cannot find authenticated user',
+          'UnknownUser',
+          req.originalUrl,
+          404
+        )
       );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal Server Error',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -106,13 +119,21 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          `The user with ID ${userId} does not exist`,
+          `The user with ID ${userId} does not exist.`,
+          'UnknownUser',
           req.originalUrl,
           404
         )
       );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -131,7 +152,8 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -160,11 +182,23 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
       },
     });
     if (!updateUser) {
-      throw new ApiError('Unknow user', req.originalUrl, 404);
+      throw new ApiError(
+        `The user with ID ${userId} does not exist.`,
+        'UnknownUser',
+        req.originalUrl,
+        404
+      );
     }
     res.status(200).json(updateUser);
   } catch (e) {
-    next(new ApiError('Internal Server Error', req.originalUrl, 500));
+    next(
+      new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
   }
 };
 

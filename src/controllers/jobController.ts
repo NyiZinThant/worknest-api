@@ -87,7 +87,14 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
       },
     });
   } catch (e) {
-    next(new ApiError('Internal server error', req.originalUrl, 500));
+    next(
+      new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
   }
 };
 
@@ -98,7 +105,8 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
   if (!req.profile) {
     next(
       new ApiError(
-        'You do not have permission to access this resource',
+        'You do not have permission to access this resource.',
+        'AccessDenied',
         req.originalUrl,
         401
       )
@@ -152,13 +160,21 @@ const getJobById = async (req: Request, res: Response, next: NextFunction) => {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          `The job with ID ${jobId} does not exist`,
+          `The job with ID ${jobId} does not exist.`,
+          'UnknownJob',
           req.originalUrl,
           404
         )
       );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -170,7 +186,8 @@ const createJob = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -207,7 +224,12 @@ const createJob = async (req: Request, res: Response, next: NextFunction) => {
     res.status(201).json(job);
   } catch (e) {
     if (!(e instanceof ApiError)) {
-      e = new ApiError('Internal server error', req.originalUrl, 500);
+      e = new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      );
     }
     next(e);
   }

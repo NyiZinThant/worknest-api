@@ -15,6 +15,7 @@ const authenticate =
         next(
           new ApiError(
             'You do not have permission to access this resource.',
+            'AccessDenied',
             req.originalUrl,
             401
           )
@@ -31,7 +32,12 @@ const authenticate =
         try {
           const refreshToken = req.cookies.refreshToken;
           if (!refreshToken) {
-            new ApiError('Refresh token missing.', req.originalUrl, 401);
+            new ApiError(
+              'Refresh token missing.',
+              'MissingRefreshToken',
+              req.originalUrl,
+              401
+            );
             return;
           }
           const refreshPayload: any = jwtUtil.verify(refreshToken, 'refresh');
@@ -49,15 +55,30 @@ const authenticate =
             next(
               new ApiError(
                 'Refresh token has expired. Please login again.',
+                'RefreshTokenExpired',
                 req.originalUrl,
                 401
               )
             );
           }
-          next(new ApiError('Invalid refresh token', req.originalUrl, 401));
+          next(
+            new ApiError(
+              'Invalid refresh token.',
+              'InvalidRefreshToken',
+              req.originalUrl,
+              401
+            )
+          );
         }
       }
-      next(new ApiError('Invalid access token', req.originalUrl, 401));
+      next(
+        new ApiError(
+          'Invalid access token.',
+          'InvalidAccessToken',
+          req.originalUrl,
+          401
+        )
+      );
     }
   };
 

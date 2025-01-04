@@ -20,7 +20,14 @@ const imageFileFilter = (
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true); // Accept the file
   } else {
-    cb(new ApiError('Unknow file format', req.originalUrl, 400)); // Reject the file
+    cb(
+      new ApiError(
+        'Wrong file format.',
+        'InvalidFileFormat',
+        req.originalUrl,
+        400
+      )
+    ); // Reject the file
   }
 };
 const imageFilename = (
@@ -60,7 +67,14 @@ const resumeFileFilter = (
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true); // Accept the file
   } else {
-    cb(new ApiError('Unknow file format', req.originalUrl, 400)); // Reject the file
+    cb(
+      new ApiError(
+        'Wrong file format.',
+        'InvalidFileFormat',
+        req.originalUrl,
+        400
+      )
+    ); // Reject the file
   }
 };
 const resumeFilename = (

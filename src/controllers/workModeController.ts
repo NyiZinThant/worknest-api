@@ -18,7 +18,14 @@ const getWorkModes = async (
     });
     res.status(200).json(workModes);
   } catch (e) {
-    next(new ApiError('Internal server error', req.originalUrl, 500));
+    next(
+      new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      )
+    );
   }
 };
 

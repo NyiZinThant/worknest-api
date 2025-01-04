@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import errorHandler from './middlewares/errorHandler';
 import authRouter from './routes/auth';
@@ -11,7 +11,6 @@ import educationsRouter from './routes/educations';
 import experiencesRouter from './routes/experiences';
 import companiesRouter from './routes/companies';
 import cookieParser from 'cookie-parser';
-import authenticate from './middlewares/authenticate';
 
 const port = process.env.PORT || 3000;
 const app = express();

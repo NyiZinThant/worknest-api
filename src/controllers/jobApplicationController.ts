@@ -6,16 +6,19 @@ import ApiError from 'src/utils/ApiError';
 // @desc Add new job application
 // @route POST /api/v1/job/:jobId/job-application
 const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
+  const { jobId } = req.params;
   try {
     if (!req.file) {
-      next(new ApiError('No resume file found', req.originalUrl, 400));
+      next(
+        new ApiError('No resume file found.', 'NoResume', req.originalUrl, 400)
+      );
       return;
     }
-    const { jobId } = req.params;
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -32,6 +35,7 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
       next(
         new ApiError(
           'The application deadline for this job has passed.',
+          'DeadlinePassed',
           req.originalUrl,
           403
         )
@@ -50,7 +54,8 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          'The job you are trying to apply for could not be found.',
+          `The job with ID ${jobId} does not exist.`,
+          'UnknownJob',
           req.originalUrl,
           401
         )
@@ -58,7 +63,14 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
     } else if (e instanceof ApiError) {
       next(e);
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };
@@ -73,7 +85,8 @@ const downloadResume = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -109,6 +122,7 @@ const downloadResume = async (
     next(
       new ApiError(
         'You do not have permission to download this resume.',
+        'AccessDenied',
         req.originalUrl,
         401
       )
@@ -118,13 +132,21 @@ const downloadResume = async (
       next(
         new ApiError(
           `The job application with ID ${jobAppId} does not exist`,
+          'UnknownJob',
           req.originalUrl,
           404
         )
       );
     }
     if (!(e instanceof ApiError)) {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
     next(e);
   }

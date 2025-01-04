@@ -14,7 +14,8 @@ const addExperience = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -42,7 +43,12 @@ const addExperience = async (
     res.status(201).json(experience);
   } catch (e) {
     if (!(e instanceof ApiError)) {
-      e = new ApiError('Internal server error', req.originalUrl, 500);
+      e = new ApiError(
+        'Internal server error.',
+        'ServerError',
+        req.originalUrl,
+        500
+      );
     }
     next(e);
   }
@@ -60,7 +66,8 @@ const removeExperienceById = async (
     if (!req.profile) {
       next(
         new ApiError(
-          'You do not have permission to access this resource',
+          'You do not have permission to access this resource.',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -76,7 +83,8 @@ const removeExperienceById = async (
     if (experience.userId !== userId) {
       next(
         new ApiError(
-          'Unauthorized access. You do not have permission to delete this experience data',
+          'You do not have permission to delete this experience data',
+          'AccessDenied',
           req.originalUrl,
           401
         )
@@ -93,13 +101,21 @@ const removeExperienceById = async (
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          `The experience with ID ${experienceId} does not exist`,
+          `The experience with ID ${experienceId} does not exist.`,
+          'UnknownExperience',
           req.originalUrl,
           404
         )
       );
     } else {
-      next(new ApiError('Internal Server Error', req.originalUrl, 500));
+      next(
+        new ApiError(
+          'Internal server error.',
+          'ServerError',
+          req.originalUrl,
+          500
+        )
+      );
     }
   }
 };

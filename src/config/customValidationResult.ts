@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 import { ValidationSubErrorType } from '../utils/ValidationError';
 
+// Custom validation to format error
 const myValidationResult =
   validationResult.withDefaults<ValidationSubErrorType>({
     formatter: (error) => {
