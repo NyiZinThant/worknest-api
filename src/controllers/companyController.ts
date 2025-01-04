@@ -93,7 +93,7 @@ const getCompanyById = async (
           'Can not find the company.',
           'UnknownCompany',
           req.originalUrl,
-          401
+          404
         )
       );
     } else {

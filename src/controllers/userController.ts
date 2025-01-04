@@ -168,7 +168,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
       gender: gender,
     };
     if (req.file) {
-      data.profileImage = req.file.path;
+      data.profileImage = req.file.filename;
     }
     if (bio) {
       data.bio = bio;

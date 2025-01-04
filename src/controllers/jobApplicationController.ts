@@ -75,12 +75,14 @@ const addJobApp = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+// @desc download resume file
+// @route GET /api/v1/job/:jobId/job-application/:jobAppId
 const downloadResume = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { jobAppId } = req.params;
+  const { jobId, jobAppId } = req.params;
   try {
     if (!req.profile) {
       next(
@@ -101,6 +103,7 @@ const downloadResume = async (
         resume: true,
         job: {
           select: {
+            id: true,
             companyId: true,
           },
         },
@@ -109,6 +112,17 @@ const downloadResume = async (
         id: jobAppId,
       },
     });
+    if (jobApp.job.id !== +jobId) {
+      next(
+        new ApiError(
+          `The job application with ID ${jobAppId} does not exist in job ID ${jobId}.`,
+          'UnknownJobApp',
+          req.originalUrl,
+          404
+        )
+      );
+      return;
+    }
     if (
       (userId && userId === jobApp.userId) ||
       (companyId && companyId === jobApp.job.companyId)
@@ -131,8 +145,8 @@ const downloadResume = async (
     if (e instanceof PrismaClientKnownRequestError && e.code === 'P2025') {
       next(
         new ApiError(
-          `The job application with ID ${jobAppId} does not exist`,
-          'UnknownJob',
+          `The job application with ID ${jobAppId} does not exist in job ID ${jobId}.`,
+          'UnknownJobApp',
           req.originalUrl,
           404
         )
