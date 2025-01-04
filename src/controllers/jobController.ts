@@ -18,6 +18,7 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
       type,
       min,
       max,
+      order,
     } = req.query;
     const where: Prisma.jobWhereInput = {
       position: { contains: search + '' },
@@ -52,7 +53,7 @@ const getJobs = async (req: Request, res: Response, next: NextFunction) => {
           },
         },
         orderBy: {
-          id: 'desc',
+          id: order === 'desc' ? 'desc' : 'asc',
         },
       }),
       prisma.job.count({ where }),
