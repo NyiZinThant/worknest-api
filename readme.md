@@ -16,7 +16,7 @@ This README includes an overview of the API, setup instructions, and examples of
 
 ---
 
-## Features {features}
+## Features
 
 - **JWT Authentication** : Secure authentication for both user and company accounts.
 - **Account Customization** : Users and companies can update profiles, including profile pictures, experience, and education.
@@ -25,7 +25,7 @@ This README includes an overview of the API, setup instructions, and examples of
 
 ---
 
-## Installation {installation}
+## Installation
 
 ### Prerequisites
 
@@ -78,7 +78,7 @@ This README includes an overview of the API, setup instructions, and examples of
 
 ---
 
-## Api Endpoints {api-endpoints}
+## Api Endpoints
 
 ### Auth > Companies
 
@@ -156,19 +156,19 @@ This README includes an overview of the API, setup instructions, and examples of
 
 ---
 
-## Postman Collection {postman-collection}
+## Postman Collection
 
 [Published Postman Collection]()
 
 ---
 
-## Authentication {authentication}
+## Authentication
 
 This API uses JWT for authentication. Currently, it doesn't require Authorization header because the tokens are sent as HTTP-only cookies. For the future, it may require Authorization header.
 
 ---
 
-## Error Handling {error-handling}
+## Error Handling
 
 The API returns standard HTTP status codes with JSON responses:
 
